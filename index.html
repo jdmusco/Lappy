@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Bedtime Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: #16213e;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 28px;
+            font-size: 28px;
+            font-weight: 850;
+            letter-spacing: -0.25px;
+            font-family: 'Monaco', 'Courier New
+        }
+
+        .toggle-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            background: #0f1419;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8b8b8b;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.97);
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #b0b0b0;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #ffffff;
+            background: #0f1419;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ff6b35;
+            background: #1a1f26;
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        input::placeholder {
+            color: #5a5a5a;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+        }
+
+        .results {
+            margin-top: 28px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #0f1419;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            font-size: 15px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .info-label {
+            color: #8b8b8b;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 16px;
+        }
+
+        .bedtimes {
+            background: #0f1419;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .bedtimes h3 {
+            margin-bottom: 18px;
+            color: #ff6b35;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .bedtime-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .bedtime-option:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .bedtime-label {
+            color: #8b8b8b;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bedtime-time {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 17px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        small {
+            color: #6a6a6a;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bedtime Calculator</h1>
+        
+        <div class="toggle-container">
+            <button class="toggle-btn active" onclick="toggleMode('plan')" id="planBtn">Workout Plan</button>
+            <button class="toggle-btn" onclick="toggleMode('minutes')" id="minutesBtn">Workout Time</button>
+        </div>
+
+        <div class="input-group" id="planInput">
+            <label for="miles">Distance (miles)</label>
+            <input type="number" id="miles" min="0" max="30" step="0.1" value="5" inputmode="decimal">
+            
+            <label for="paceMin" style="margin-top: 15px;">Target Pace (min/mile)</label>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="paceMin" placeholder="8:00" value="8:30" pattern="[0-9]{1,2}:[0-9]{2}" style="flex: 1;">
+                <span style="color: #6a6a6a; font-weight: 600;">—</span>
+                <input type="text" id="paceMax" placeholder="9:00" value="9:30" pattern="[0-9]{1,2}:[0-9]{2}" style="flex: 1;">
+            </div>
+            <small style="color: #6a6a6a; margin-top: 5px; display: block;">Format: MM:SS (e.g., 8:30)</small>
+        </div>
+
+        <div class="input-group" id="minutesInput" style="display: none;">
+            <label for="workout">Workout Duration (minutes)</label>
+            <input type="number" id="workout" min="0" max="300" value="45" inputmode="numeric">
+        </div>
+
+        <button onclick="calculate()">Calculate Bedtimes</button>
+
+        <div class="results" id="results">
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Wake time</span>
+                    <span class="info-value" id="wakeTime"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Workout starts</span>
+                    <span class="info-value" id="runStart"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Workout ends</span>
+                    <span class="info-value" id="finishTime"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Out the door</span>
+                    <span class="info-value">05:45 AM</span>
+                </div>
+            </div>
+
+            <div class="bedtimes">
+                <h3>Sleep Target</h3>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">6 hours</span>
+                    <span class="bedtime-time" id="bed6"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">6.5 hours</span>
+                    <span class="bedtime-time" id="bed6-5"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">7 hours</span>
+                    <span class="bedtime-time" id="bed7"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">7.5 hours</span>
+                    <span class="bedtime-time" id="bed7-5"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">8 hours</span>
+                    <span class="bedtime-time" id="bed8"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'plan'; // Default to workout plan mode
+
+        function toggleMode(mode) {
+            currentMode = mode;
+            
+            // Update button states
+            document.getElementById('minutesBtn').classList.toggle('active', mode === 'minutes');
+            document.getElementById('planBtn').classList.toggle('active', mode === 'plan');
+            
+            // Toggle input visibility
+            document.getElementById('minutesInput').style.display = mode === 'minutes' ? 'block' : 'none';
+            document.getElementById('planInput').style.display = mode === 'plan' ? 'block' : 'none';
+            
+            // Recalculate with current inputs
+            calculate();
+        }
+
+        function parsePace(paceStr) {
+            // Parse pace in format "MM:SS" and return total minutes as decimal
+            const parts = paceStr.trim().split(':');
+            if (parts.length !== 2) return null;
+            
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            
+            if (isNaN(minutes) || isNaN(seconds)) return null;
+            
+            return minutes + (seconds / 60);
+        }
+
+        function getWorkoutMinutes() {
+            if (currentMode === 'minutes') {
+                return parseInt(document.getElementById('workout').value) || 0;
+            } else {
+                // Calculate from miles and pace
+                const miles = parseFloat(document.getElementById('miles').value) || 0;
+                const paceMinStr = document.getElementById('paceMin').value;
+                const paceMaxStr = document.getElementById('paceMax').value;
+                
+                const paceMin = parsePace(paceMinStr);
+                const paceMax = parsePace(paceMaxStr);
+                
+                if (!miles || !paceMin || !paceMax) {
+                    return 0;
+                }
+                
+                // Calculate min and max workout times
+                const minTime = miles * paceMin;
+                const maxTime = miles * paceMax;
+                
+                // Use average for calculation
+                return Math.round((minTime + maxTime) / 2);
+            }
+        }
+
+        function calculate() {
+            const workoutMinutes = getWorkoutMinutes();
+            
+            // Fixed times and constraints
+            const outDoorTime = new Date();
+            outDoorTime.setHours(5, 45, 0);
+            
+            const prepTimeAfterWorkout = 20; // minutes to shower and get ready
+            const prepTimeBeforeWorkout = 15; // minutes to get ready for run
+            
+            let wakeTime, runStartTime, finishTime;
+            
+            if (workoutMinutes <= 60) {
+                // Normal schedule - wake at 4:30, start at 4:45
+                wakeTime = new Date();
+                wakeTime.setHours(4, 30, 0);
+                
+                runStartTime = new Date();
+                runStartTime.setHours(4, 45, 0);
+                
+                finishTime = new Date(runStartTime.getTime() + workoutMinutes * 60000);
+            } else {
+                // Longer workout - work backwards from out door time
+                // Must finish by: out door time - prep time after workout
+                finishTime = new Date(outDoorTime.getTime() - prepTimeAfterWorkout * 60000);
+                
+                // Workout start: finish time - workout duration
+                runStartTime = new Date(finishTime.getTime() - workoutMinutes * 60000);
+                
+                // Wake time: workout start - prep time before workout
+                wakeTime = new Date(runStartTime.getTime() - prepTimeBeforeWorkout * 60000);
+            }
+            
+            // Update display
+            document.getElementById('wakeTime').textContent = formatTime(wakeTime);
+            document.getElementById('runStart').textContent = formatTime(runStartTime);
+            document.getElementById('finishTime').textContent = formatTime(finishTime);
+            
+            // Calculate bedtimes based on adjusted wake time
+            const sleepDurations = [
+                { id: 'bed6', hours: 6 },
+                { id: 'bed6-5', hours: 6.5 },
+                { id: 'bed7', hours: 7 },
+                { id: 'bed7-5', hours: 7.5 },
+                { id: 'bed8', hours: 8 }
+            ];
+            
+            sleepDurations.forEach(duration => {
+                const bedtime = new Date(wakeTime.getTime() - duration.hours * 3600000);
+                document.getElementById(duration.id).textContent = formatTime(bedtime);
+            });
+            
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
+        
+        function formatTime(date) {
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+            
+            return `${hours}:${minutesStr} ${ampm}`;
+        }
+
+        // Allow Enter key to trigger calculation on all inputs
+        document.getElementById('workout').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculate();
+        });
+        
+        document.getElementById('miles').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculate();
+        });
+        
+        document.getElementById('paceMin').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculate();
+        });
+        
+        document.getElementById('paceMax').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') calculate();
+        });
+
+        // Calculate on load with default value
+        window.addEventListener('load', calculate);
+    </script>
+</body>
+</html>
