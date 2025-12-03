@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Bedtime Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .results {
+            margin-top: 25px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .info-label {
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bedtimes {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .bedtimes h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .bedtime-option {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .bedtime-option:last-child {
+            border-bottom: none;
+        }
+
+        .bedtime-label {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .bedtime-time {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌙 Bedtime Calculator</h1>
+        
+        <div class="input-group">
+            <label for="workout">Length of workout (minutes):</label>
+            <input type="number" id="workout" min="0" max="300" value="45" inputmode="numeric">
+        </div>
+
+        <button onclick="calculate()">Calculate Bedtimes</button>
+
+        <div class="results" id="results">
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Wake time:</span>
+                    <span class="info-value" id="wakeTime"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Workout starts:</span>
+                    <span class="info-value" id="runStart"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Workout ends:</span>
+                    <span class="info-value" id="finishTime"></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Out the door:</span>
+                    <span class="info-value">05:45 AM</span>
+                </div>
+            </div>
+
+            <div class="bedtimes">
+                <h3>Ideal bedtimes:</h3>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">6 hours</span>
+                    <span class="bedtime-time" id="bed6"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">6.5 hours</span>
+                    <span class="bedtime-time" id="bed6-5"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">7 hours</span>
+                    <span class="bedtime-time" id="bed7"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">7.5 hours</span>
+                    <span class="bedtime-time" id="bed7-5"></span>
+                </div>
+                <div class="bedtime-option">
+                    <span class="bedtime-label">8 hours</span>
+                    <span class="bedtime-time" id="bed8"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const workoutMinutes = parseInt(document.getElementById('workout').value) || 0;
+            
+            // Fixed times and constraints
+            const outDoorTime = new Date();
+            outDoorTime.setHours(5, 45, 0);
+            
+            const prepTimeAfterWorkout = 20; // minutes to shower and get ready
+            const prepTimeBeforeWorkout = 15; // minutes to get ready for run
+            
+            let wakeTime, runStartTime, finishTime;
+            
+            if (workoutMinutes <= 60) {
+                // Normal schedule - wake at 4:30, start at 4:45
+                wakeTime = new Date();
+                wakeTime.setHours(4, 30, 0);
+                
+                runStartTime = new Date();
+                runStartTime.setHours(4, 45, 0);
+                
+                finishTime = new Date(runStartTime.getTime() + workoutMinutes * 60000);
+            } else {
+                // Longer workout - work backwards from out door time
+                // Must finish by: out door time - prep time after workout
+                finishTime = new Date(outDoorTime.getTime() - prepTimeAfterWorkout * 60000);
+                
+                // Workout start: finish time - workout duration
+                runStartTime = new Date(finishTime.getTime() - workoutMinutes * 60000);
+                
+                // Wake time: workout start - prep time before workout
+                wakeTime = new Date(runStartTime.getTime() - prepTimeBeforeWorkout * 60000);
+            }
+            
+            // Update display
+            document.getElementById('wakeTime').textContent = formatTime(wakeTime);
+            document.getElementById('runStart').textContent = formatTime(runStartTime);
+            document.getElementById('finishTime').textContent = formatTime(finishTime);
+            
+            // Calculate bedtimes based on adjusted wake time
+            const sleepDurations = [
+                { id: 'bed6', hours: 6 },
+                { id: 'bed6-5', hours: 6.5 },
+                { id: 'bed7', hours: 7 },
+                { id: 'bed7-5', hours: 7.5 },
+                { id: 'bed8', hours: 8 }
+            ];
+            
+            sleepDurations.forEach(duration => {
+                const bedtime = new Date(wakeTime.getTime() - duration.hours * 3600000);
+                document.getElementById(duration.id).textContent = formatTime(bedtime);
+            });
+            
+            // Show results
+            document.getElementById('results').classList.add('show');
+        }
+        
+        function formatTime(date) {
+            let hours = date.getHours();
+            const minutes = date.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            
+            const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+            
+            return `${hours}:${minutesStr} ${ampm}`;
+        }
+
+        // Allow Enter key to trigger calculation
+        document.getElementById('workout').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+
+        // Calculate on load with default value
+        window.addEventListener('load', calculate);
+    </script>
+</body>
+</html>
